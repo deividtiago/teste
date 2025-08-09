@@ -1,0 +1,25 @@
+import pandas as pd
+from kestra import Kestra
+
+from langchain_together import ChatTogether
+from dotenv import load_dotenv
+import os
+
+# Carrega as variáveis do .env (opcional se já usa `env:` no Kestra)
+load_dotenv()
+
+API_KEY = os.getenv("TOGETHER_API_KEY")
+print("Chave carregada:", API_KEY)
+if not API_KEY:
+    raise ValueError("TOGETHER_API_KEY não está definida!")
+
+# Inicializa o modelo corretamente
+llm = ChatTogether(
+    model="deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    temperature=0,
+    together_api_key=API_KEY  # <-- corrigido aqui
+)
+
+# Teste simples
+saida = llm.invoke("Hello")
+print(saida)
