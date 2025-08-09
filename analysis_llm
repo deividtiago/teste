@@ -2,14 +2,20 @@ import pandas as pd
 from kestra import Kestra
 
 from langchain_together import ChatTogether
+from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 from dotenv import load_dotenv
 import os
 
+
 # Carrega as variáveis do .env (opcional se já usa `env:` no Kestra)
 load_dotenv()
-
 API_KEY = os.getenv("TOGETHER_API_KEY")
 print("Chave carregada:", API_KEY)
+
+df = pd.read_csv("raw_data.csv")
+
+
+
 if not API_KEY:
     raise ValueError("TOGETHER_API_KEY não está definida!")
 
@@ -21,5 +27,17 @@ llm = ChatTogether(
 )
 
 # Teste simples
-saida = llm.invoke("Hello")
-print(saida)
+#saida = llm.invoke("Hello")
+#print(saida)
+
+agent_executor = create_pandas_dataframe_agent(
+  llm,
+  df,
+  agent_type="tool-calling",
+  verbose=True,
+  allow_dangerous_code=True
+)
+
+result = agent_executor.invoke("""
+Você é um analista de dados e especialista em negócios. Investigue o dataset e me forneça insights interessantes para o meu negócio""")
+print(result)
